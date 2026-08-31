@@ -35,6 +35,7 @@ SLIP_FIELDS = [
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("PORTAL_SECRET_KEY", "dev-secret-change-me")
+app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # 8MB, generous for a signature photo
 PORTAL_PASSWORD = os.environ.get("PORTAL_PASSWORD", "credithive")
 
 db.init_db()
@@ -168,23 +169,30 @@ def settings():
 @app.route("/settings/signature", methods=["POST"])
 @login_required
 def save_signature():
-    data_url = request.form.get("signature_data")
-    if not data_url or "," not in data_url:
-        flash("No signature captured.", "error")
-        return redirect(url_for("settings"))
     import base64
     import io
-    header, encoded = data_url.split(",", 1)
-    try:
+
+    uploaded = request.files.get("signature_file")
+    if uploaded and uploaded.filename:
+        raw = uploaded.read()
+    else:
+        data_url = request.form.get("signature_data")
+        if not data_url or "," not in data_url:
+            flash("No signature captured.", "error")
+            return redirect(url_for("settings"))
+        header, encoded = data_url.split(",", 1)
         raw = base64.b64decode(encoded)
+
+    try:
         from PIL import Image
-        Image.open(io.BytesIO(raw)).verify()
+        image = Image.open(io.BytesIO(raw))
+        image.load()
     except Exception:
-        flash("That signature image could not be read. Please try drawing it again.", "error")
+        flash("That signature image could not be read. Please try again.", "error")
         return redirect(url_for("settings"))
+
     db.DATA_DIR.mkdir(parents=True, exist_ok=True)
-    with open(db.SIGNATURE_PATH, "wb") as f:
-        f.write(raw)
+    image.convert("RGBA").save(db.SIGNATURE_PATH, format="PNG")
     flash("Signature saved.", "success")
     return redirect(url_for("settings"))
 

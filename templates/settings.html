@@ -38,7 +38,7 @@
 
 <div class="card form-card">
   <h2>Authorised signatory signature</h2>
-  <p class="muted">Used on every generated payslip. Draw it once here; it stays until you clear it.</p>
+  <p class="muted">Used on every generated payslip. Draw it or upload a photo/scan; it stays until you clear it.</p>
 
   {% if has_signature %}
   <div class="signature-preview">
@@ -54,10 +54,20 @@
   <canvas id="signature-pad" width="400" height="150"></canvas>
   <div class="form-actions">
     <button type="button" id="clear-pad" class="btn btn-secondary">Clear pad</button>
-    <button type="button" id="save-signature" class="btn btn-primary">Save signature</button>
+    <button type="button" id="save-signature" class="btn btn-primary">Save drawn signature</button>
   </div>
   <form id="signature-form" method="post" action="{{ url_for('save_signature') }}">
     <input type="hidden" name="signature_data" id="signature_data">
+  </form>
+
+  <hr>
+
+  <p class="muted">Or upload a photo/scan of a signature (JPEG or PNG):</p>
+  <form method="post" action="{{ url_for('save_signature') }}" enctype="multipart/form-data" class="form-row">
+    <input type="file" name="signature_file" accept="image/jpeg,image/png">
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Upload signature</button>
+    </div>
   </form>
 </div>
 
