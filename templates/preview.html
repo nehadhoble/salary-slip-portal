@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Preview - Salary Slip Portal{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Preview</h1>
+  <div class="form-actions">
+    <a class="btn btn-secondary" href="{{ url_for('slip_form') }}?employee_id={{ form.employee_id }}">Back to edit</a>
+    <form method="post" action="{{ url_for('slip_pdf') }}" class="inline-form">
+      {% for field in slip_fields %}
+      <input type="hidden" name="{{ field }}" value="{{ form[field] }}">
+      {% endfor %}
+      <button type="submit" class="btn btn-primary">Download PDF</button>
+    </form>
+  </div>
+</div>
+
+<div class="payslip-sheet">
+  <div class="payslip-header">
+    <h2>{{ company.name }}</h2>
+    {% for line in company.address_lines %}
+    <p>{{ line }}</p>
+    {% endfor %}
+    <p>PAN - {{ company.pan }}</p>
+    <p>CIN: {{ company.cin }}</p>
+  </div>
+
+  <h3 class="payslip-title">Pay Slip</h3>
+  <p class="payslip-month">for {{ form.month }}-{{ form.year }}</p>
+  <p class="payslip-name">{{ form.employee_name or "—" }}</p>
+
+  <div class="payslip-detail-grid">
+    <div>
+      <div class="detail-row"><span>Employee Number :</span><span>{{ form.employee_no or "-" }}</span></div>
+      <div class="detail-row"><span>Function :</span><span>{{ form.function or "-" }}</span></div>
+      <div class="detail-row"><span>Designation :</span><span>{{ form.designation or "-" }}</span></div>
+      <div class="detail-row"><span>Location :</span><span>{{ form.location or "-" }}</span></div>
+      <div class="detail-row"><span>Bank Details :</span><span>{{ form.bank_details or "-" }}</span></div>
+      <div class="detail-row"><span>Date of joining :</span><span>{{ form.date_of_joining or "-" }}</span></div>
+    </div>
+    <div>
+      <div class="detail-row"><span>Tax Regime :</span><span>{{ form.tax_regime or "-" }}</span></div>
+      <div class="detail-row"><span>Income Tax Number (PAN) :</span><span>{{ form.pan or "-" }}</span></div>
+      <div class="detail-row"><span>Universal Account Number (UAN) :</span><span>{{ form.uan or "-" }}</span></div>
+      <div class="detail-row"><span>PF account number :</span><span>{{ form.pf_account_number or "-" }}</span></div>
+      <div class="detail-row"><span>ESI Number :</span><span>{{ form.esi_number or "-" }}</span></div>
+      <div class="detail-row"><span>PR Account Number (PRAN) :</span><span>{{ form.pran or "-" }}</span></div>
+    </div>
+  </div>
+
+  <table class="payslip-table">
+    <thead>
+      <tr>
+        <th>Earnings</th><th>Amount</th><th>Gross Salary</th>
+        <th>Deductions</th><th>Amount</th><th>Gross Salary</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for label, amount in rows %}
+      <tr>
+        <td>{{ label }}</td>
+        <td class="num">{{ format_amount(amount) }}</td>
+        <td class="num">{{ format_amount(amount) }}</td>
+        <td></td><td></td><td></td>
+      </tr>
+      {% endfor %}
+      <tr class="bold-row">
+        <td>Total Earnings</td>
+        <td class="num">{{ net }}</td>
+        <td class="num">{{ net }}</td>
+        <td>Total Deductions</td>
+        <td class="num">0.00</td>
+        <td class="num">0.00</td>
+      </tr>
+      <tr class="bold-row">
+        <td></td><td></td><td></td>
+        <td>Net Amount</td>
+        <td class="num">₹ {{ net }}</td>
+        <td class="num">₹ {{ net }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="payslip-footer">
+    <div class="footer-words">
+      <strong>Amount (in words):</strong>
+      <p>{{ words }}</p>
+    </div>
+    <div class="footer-signature">
+      <p><strong>for {{ company.name }}</strong></p>
+      {% if has_signature %}
+      <img src="{{ url_for('signature_image') }}" alt="Signature">
+      {% else %}
+      <div class="signature-placeholder">(no signature saved)</div>
+      {% endif %}
+      <p>Authorised Signatory</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Employees - Salary Slip Portal{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Employees</h1>
+  <a class="btn btn-primary" href="{{ url_for('employee_new') }}">+ Add employee</a>
+</div>
+
+{% if employees %}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Designation</th>
+        <th>Date of joining</th>
+        <th>PAN</th>
+        <th>Bank details</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for e in employees %}
+      <tr>
+        <td>{{ e.name }}</td>
+        <td>{{ e.designation }}</td>
+        <td>{{ e.date_of_joining }}</td>
+        <td>{{ e.pan }}</td>
+        <td>{{ e.account_no }}{% if e.ifsc_code %} &middot; {{ e.ifsc_code }}{% endif %}</td>
+        <td class="row-actions">
+          <a href="{{ url_for('slip_form', employee_id=e.id) }}" title="New slip for this employee">New slip</a>
+          <a href="{{ url_for('employee_edit', employee_id=e.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('employee_delete', employee_id=e.id) }}"
+                onsubmit="return confirm('Delete {{ e.name }}? This cannot be undone.');" class="inline-form">
+            <button type="submit" class="link-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card empty-state">
+  <p>No employees saved yet.</p>
+  <a class="btn btn-primary" href="{{ url_for('employee_new') }}">Add your first employee</a>
+</div>
+{% endif %}
+{% endblock %}

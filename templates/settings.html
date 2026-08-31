@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Settings - Salary Slip Portal{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1>Settings</h1>
+</div>
+
+<div class="card form-card">
+  <h2>Earnings split formula</h2>
+  <p class="muted">
+    Percentages used to split Total Earnings into components. Conveyance always
+    absorbs whatever remains, so the printed Total Earnings never drifts from
+    what you type on the slip form.
+  </p>
+  <form method="post" action="{{ url_for('settings') }}">
+    <div class="form-row">
+      <label for="basic_pct">Basic Pay (% of Total Earnings)</label>
+      <input type="number" step="0.01" id="basic_pct" name="basic_pct" value="{{ settings.basic_pct }}" required>
+    </div>
+    <div class="form-row">
+      <label for="hra_pct">HRA (% of Basic)</label>
+      <input type="number" step="0.01" id="hra_pct" name="hra_pct" value="{{ settings.hra_pct }}" required>
+    </div>
+    <div class="form-row">
+      <label for="lta_pct">LTA (% of Basic)</label>
+      <input type="number" step="0.01" id="lta_pct" name="lta_pct" value="{{ settings.lta_pct }}" required>
+    </div>
+    <div class="form-row">
+      <label for="other_pct">Other Allowances (% of Basic)</label>
+      <input type="number" step="0.01" id="other_pct" name="other_pct" value="{{ settings.other_pct }}" required>
+    </div>
+    <div class="form-actions">
+      <button type="submit" name="action" value="reset" class="btn btn-secondary">Reset to defaults</button>
+      <button type="submit" name="action" value="save" class="btn btn-primary">Save</button>
+    </div>
+  </form>
+</div>
+
+<div class="card form-card">
+  <h2>Authorised signatory signature</h2>
+  <p class="muted">Used on every generated payslip. Draw it once here; it stays until you clear it.</p>
+
+  {% if has_signature %}
+  <div class="signature-preview">
+    <img src="{{ url_for('signature_image') }}" alt="Current signature">
+  </div>
+  <form method="post" action="{{ url_for('clear_signature') }}" onsubmit="return confirm('Clear the saved signature?');">
+    <button type="submit" class="btn btn-secondary">Clear signature</button>
+  </form>
+  <hr>
+  {% endif %}
+
+  <p class="muted">Draw a new signature below:</p>
+  <canvas id="signature-pad" width="400" height="150"></canvas>
+  <div class="form-actions">
+    <button type="button" id="clear-pad" class="btn btn-secondary">Clear pad</button>
+    <button type="button" id="save-signature" class="btn btn-primary">Save signature</button>
+  </div>
+  <form id="signature-form" method="post" action="{{ url_for('save_signature') }}">
+    <input type="hidden" name="signature_data" id="signature_data">
+  </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/signature.js') }}"></script>
+{% endblock %}
