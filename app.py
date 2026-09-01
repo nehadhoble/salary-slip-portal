@@ -225,6 +225,18 @@ def _form_data_from_request(source):
     return data
 
 
+def _parse_amount(raw):
+    """Total Earnings as typed by a person - tolerate "30,000", "₹30,000" etc.
+    instead of crashing on the plain float() the field used to get."""
+    if not raw:
+        return 0.0
+    cleaned = raw.replace(",", "").replace("₹", "").replace("Rs.", "").replace("Rs", "").strip()
+    try:
+        return float(cleaned)
+    except ValueError:
+        return 0.0
+
+
 @app.route("/slip")
 @login_required
 def slip_form():
@@ -262,7 +274,7 @@ def slip_form():
 @login_required
 def slip_preview():
     form = _form_data_from_request(request.form)
-    total_earnings = float(form["total_earnings"] or 0)
+    total_earnings = _parse_amount(form["total_earnings"])
     breakdown = calculate(total_earnings, db.load_settings())
     rows = breakdown_rows(breakdown)
     net = format_amount(breakdown["total_earnings"])
@@ -286,7 +298,7 @@ def slip_preview():
 @login_required
 def slip_pdf():
     form = _form_data_from_request(request.form)
-    total_earnings = float(form["total_earnings"] or 0)
+    total_earnings = _parse_amount(form["total_earnings"])
     breakdown = calculate(total_earnings, db.load_settings())
 
     pdf_form = dict(form)
