@@ -307,13 +307,13 @@ def slip_pdf():
         if employee:
             pdf_form["_employee_bank_details"] = db.bank_details_summary(employee)
 
-    import tempfile
+    import io
     filename = payslip_filename(pdf_form)
-    with tempfile.TemporaryDirectory() as tmp:
-        out_path = Path(tmp) / filename
-        signature_path = db.SIGNATURE_PATH if db.SIGNATURE_PATH.exists() else None
-        generate_pdf(out_path, pdf_form, breakdown, COMPANY, signature_path)
-        return send_file(out_path, as_attachment=True, download_name=filename, mimetype="application/pdf")
+    signature_path = db.SIGNATURE_PATH if db.SIGNATURE_PATH.exists() else None
+    buffer = io.BytesIO()
+    generate_pdf(buffer, pdf_form, breakdown, COMPANY, signature_path)
+    buffer.seek(0)
+    return send_file(buffer, as_attachment=True, download_name=filename, mimetype="application/pdf")
 
 
 if __name__ == "__main__":

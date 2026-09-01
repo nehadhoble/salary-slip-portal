@@ -231,7 +231,7 @@ def generate_pdf(output_path, form, breakdown, company, signature_path=None):
     designation, location, bank_details, date_of_joining, tax_regime, pan, uan,
     pf_account_number, esi_number, pran). breakdown: dict from calculator.calculate().
     company: dict with name, address_lines, pan, cin."""
-    c = canvas.Canvas(str(output_path), pagesize=(PAGE_WIDTH, PAGE_HEIGHT))
+    c = canvas.Canvas(output_path, pagesize=(PAGE_WIDTH, PAGE_HEIGHT))
     center_x = PAGE_WIDTH / 2.0
     y = 55.0
 
