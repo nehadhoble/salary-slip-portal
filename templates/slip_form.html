@@ -44,11 +44,8 @@
   <div class="form-grid">
     <div class="form-row">
       <label for="employee_no">Employee number</label>
-      <input type="text" id="employee_no" name="employee_no" value="{{ form.employee_no }}">
-    </div>
-    <div class="form-row">
-      <label for="function">Function</label>
-      <input type="text" id="function" name="function" value="{{ form.function }}">
+      <input type="text" id="employee_no" name="employee_no" value="{{ form.employee_no }}" readonly
+             placeholder="Set on the employee record">
     </div>
     <div class="form-row">
       <label for="designation">Designation</label>
@@ -119,6 +116,7 @@
     if (!res.ok) return;
     const e = await res.json();
     document.getElementById("employee_name").value = e.name || "";
+    document.getElementById("employee_no").value = e.employee_no || "";
     document.getElementById("designation").value = e.designation || "";
     document.getElementById("date_of_joining").value = e.date_of_joining || "";
     document.getElementById("pan").value = e.pan || "";

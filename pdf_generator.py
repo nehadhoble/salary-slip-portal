@@ -5,6 +5,7 @@ reference layout pixel-for-pixel (Android canvas y grows downward, so each
 drawn y is converted to ReportLab's bottom-up coordinate via PAGE_HEIGHT - y).
 """
 import re
+from itertools import zip_longest
 
 from reportlab.lib.colors import HexColor, black
 from reportlab.pdfbase.pdfmetrics import stringWidth
@@ -103,7 +104,6 @@ def _build_payslip_rows(breakdown):
 def _build_detail_columns(form, employee_bank_details):
     left = [
         ("Employee Number", form.get("employee_no", "")),
-        ("Function", form.get("function", "")),
         ("Designation", form.get("designation", "")),
         ("Location", form.get("location", "")),
         ("Bank Details", employee_bank_details or form.get("bank_details", "")),
@@ -131,11 +131,13 @@ def _draw_detail_grid(c, start_y, form, employee_bank_details):
     right_value_max_width = PAGE_WIDTH - MARGIN - right_value_x
 
     y = start_y
-    for (llabel, lvalue), (rlabel, rvalue) in zip(left, right):
-        _draw_text(c, left_label_x, y, f"{llabel} :", 8.6, bold=True)
-        _draw_fitted_text(c, left_value_x, y, lvalue or "-", 8.6, False, left_value_max_width)
-        _draw_text(c, right_label_x, y, f"{rlabel} :", 8.6, bold=True)
-        _draw_fitted_text(c, right_value_x, y, rvalue or "-", 8.6, False, right_value_max_width)
+    for (llabel, lvalue), (rlabel, rvalue) in zip_longest(left, right, fillvalue=("", "")):
+        if llabel:
+            _draw_text(c, left_label_x, y, f"{llabel} :", 8.6, bold=True)
+            _draw_fitted_text(c, left_value_x, y, lvalue or "-", 8.6, False, left_value_max_width)
+        if rlabel:
+            _draw_text(c, right_label_x, y, f"{rlabel} :", 8.6, bold=True)
+            _draw_fitted_text(c, right_value_x, y, rvalue or "-", 8.6, False, right_value_max_width)
         y += row_height
     return y
 

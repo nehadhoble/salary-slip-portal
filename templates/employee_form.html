@@ -11,6 +11,10 @@
     <input type="text" id="name" name="name" value="{{ employee.name if employee else '' }}" required>
   </div>
   <div class="form-row">
+    <label for="employee_no">Employee number</label>
+    <input type="text" id="employee_no" name="employee_no" value="{{ employee.employee_no if employee else '' }}">
+  </div>
+  <div class="form-row">
     <label for="designation">Designation</label>
     <input type="text" id="designation" name="designation" value="{{ employee.designation if employee else '' }}">
   </div>

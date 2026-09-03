@@ -11,6 +11,7 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS employees (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    employee_no TEXT NOT NULL DEFAULT '',
     designation TEXT NOT NULL DEFAULT '',
     date_of_joining TEXT NOT NULL DEFAULT '',
     pan TEXT NOT NULL DEFAULT '',
@@ -40,6 +41,9 @@ def init_db():
     conn = get_db()
     try:
         conn.executescript(SCHEMA)
+        existing_columns = {row[1] for row in conn.execute("PRAGMA table_info(employees)")}
+        if "employee_no" not in existing_columns:
+            conn.execute("ALTER TABLE employees ADD COLUMN employee_no TEXT NOT NULL DEFAULT ''")
         row = conn.execute("SELECT 1 FROM formula_settings WHERE id = 1").fetchone()
         if row is None:
             conn.execute(
@@ -77,20 +81,20 @@ def get_employee(employee_id):
         conn.close()
 
 
-def save_employee(employee_id, name, designation, date_of_joining, pan, account_no, ifsc_code):
+def save_employee(employee_id, name, employee_no, designation, date_of_joining, pan, account_no, ifsc_code):
     conn = get_db()
     try:
         if employee_id:
             conn.execute(
-                """UPDATE employees SET name=?, designation=?, date_of_joining=?, pan=?,
+                """UPDATE employees SET name=?, employee_no=?, designation=?, date_of_joining=?, pan=?,
                    account_no=?, ifsc_code=? WHERE id=?""",
-                (name, designation, date_of_joining, pan, account_no, ifsc_code, employee_id),
+                (name, employee_no, designation, date_of_joining, pan, account_no, ifsc_code, employee_id),
             )
         else:
             conn.execute(
-                """INSERT INTO employees (name, designation, date_of_joining, pan, account_no, ifsc_code)
-                   VALUES (?, ?, ?, ?, ?, ?)""",
-                (name, designation, date_of_joining, pan, account_no, ifsc_code),
+                """INSERT INTO employees (name, employee_no, designation, date_of_joining, pan, account_no, ifsc_code)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                (name, employee_no, designation, date_of_joining, pan, account_no, ifsc_code),
             )
         conn.commit()
     finally:

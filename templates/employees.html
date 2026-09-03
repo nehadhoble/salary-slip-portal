@@ -12,6 +12,7 @@
     <thead>
       <tr>
         <th>Name</th>
+        <th>Employee no.</th>
         <th>Designation</th>
         <th>Date of joining</th>
         <th>PAN</th>
@@ -23,6 +24,7 @@
       {% for e in employees %}
       <tr>
         <td>{{ e.name }}</td>
+        <td>{{ e.employee_no }}</td>
         <td>{{ e.designation }}</td>
         <td>{{ e.date_of_joining }}</td>
         <td>{{ e.pan }}</td>

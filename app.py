@@ -28,7 +28,7 @@ MONTH_NAMES = [
 TAX_REGIME_OPTIONS = ["Regular Tax Regime", "New Tax Regime", "Old Tax Regime"]
 
 SLIP_FIELDS = [
-    "month", "year", "employee_id", "employee_name", "employee_no", "function",
+    "month", "year", "employee_id", "employee_name", "employee_no",
     "designation", "location", "bank_details", "date_of_joining", "tax_regime",
     "pan", "uan", "pf_account_number", "esi_number", "pran", "total_earnings",
 ]
@@ -116,6 +116,7 @@ def _save_employee_from_form(employee_id):
     db.save_employee(
         employee_id,
         name=request.form.get("name", "").strip(),
+        employee_no=request.form.get("employee_no", "").strip(),
         designation=request.form.get("designation", "").strip(),
         date_of_joining=request.form.get("date_of_joining", "").strip(),
         pan=request.form.get("pan", "").strip(),
@@ -254,6 +255,7 @@ def slip_form():
         if employee:
             prefill["employee_id"] = str(employee["id"])
             prefill["employee_name"] = employee["name"]
+            prefill["employee_no"] = employee["employee_no"]
             prefill["designation"] = employee["designation"]
             prefill["date_of_joining"] = employee["date_of_joining"]
             prefill["pan"] = employee["pan"]
