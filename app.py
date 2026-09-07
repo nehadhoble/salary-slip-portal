@@ -14,12 +14,21 @@ from pdf_generator import generate_pdf, payslip_filename
 
 BASE_DIR = Path(__file__).parent
 
-COMPANY = {
-    "name": "CREDITHIVE PRIVATE LIMITED",
-    "address_lines": ["Floor 6, Almonte IT Park, Kharadi,", "Pune - 411014"],
-    "pan": "AANCC8647H",
-    "cin": "U62099PN2026PTC255950",
+COMPANIES = {
+    "Credithive Technologies": {
+        "name": "CREDITHIVE PRIVATE LIMITED",
+        "address_lines": ["Floor 6, Almonte IT Park, Kharadi,", "Pune - 411014"],
+        "pan": "AANCC8647H",
+        "cin": "U62099PN2026PTC255950",
+    },
+    "Mobihive Technologies": {
+        "name": "MOBIHIVE TECHNOLOGIES PRIVATE LIMITED",
+        "address_lines": ["House no. 1319, sector 18c,", "Chandigarh, Chandigarh - 160018"],
+        "pan": "AAJCM3001F",
+        "cin": "04AAJCM3001F2Z3",
+    },
 }
+DEFAULT_COMPANY = "Credithive Technologies"
 
 MONTH_NAMES = [
     "January", "February", "March", "April", "May", "June",
@@ -28,7 +37,7 @@ MONTH_NAMES = [
 TAX_REGIME_OPTIONS = ["Regular Tax Regime", "New Tax Regime", "Old Tax Regime"]
 
 SLIP_FIELDS = [
-    "month", "year", "employee_id", "employee_name", "employee_no",
+    "month", "year", "company", "employee_id", "employee_name", "employee_no",
     "designation", "location", "bank_details", "date_of_joining", "tax_regime",
     "pan", "uan", "pf_account_number", "esi_number", "pran", "total_earnings",
 ]
@@ -73,7 +82,7 @@ def logout():
 @app.route("/")
 @login_required
 def home():
-    return render_template("home.html", company=COMPANY)
+    return render_template("home.html", company=COMPANIES[DEFAULT_COMPANY])
 
 
 # ---- Employees ----
@@ -223,6 +232,8 @@ def _form_data_from_request(source):
         data["month"] = MONTH_NAMES[0]
     if not data["tax_regime"]:
         data["tax_regime"] = TAX_REGIME_OPTIONS[0]
+    if data["company"] not in COMPANIES:
+        data["company"] = DEFAULT_COMPANY
     return data
 
 
@@ -249,6 +260,7 @@ def slip_form():
     prefill["year"] = str(now.year)
     prefill["location"] = "Pune"
     prefill["tax_regime"] = TAX_REGIME_OPTIONS[0]
+    prefill["company"] = DEFAULT_COMPANY
 
     if employee_id:
         employee = db.get_employee(employee_id)
@@ -269,6 +281,7 @@ def slip_form():
         months=MONTH_NAMES,
         years=year_options,
         tax_regimes=TAX_REGIME_OPTIONS,
+        companies=list(COMPANIES),
     )
 
 
@@ -285,7 +298,7 @@ def slip_preview():
     return render_template(
         "preview.html",
         form=form,
-        company=COMPANY,
+        company=COMPANIES[form["company"]],
         breakdown=breakdown,
         rows=rows,
         net=net,
@@ -313,7 +326,7 @@ def slip_pdf():
     filename = payslip_filename(pdf_form)
     signature_path = db.SIGNATURE_PATH if db.SIGNATURE_PATH.exists() else None
     buffer = io.BytesIO()
-    generate_pdf(buffer, pdf_form, breakdown, COMPANY, signature_path)
+    generate_pdf(buffer, pdf_form, breakdown, COMPANIES[form["company"]], signature_path)
     buffer.seek(0)
     return send_file(buffer, as_attachment=True, download_name=filename, mimetype="application/pdf")
 

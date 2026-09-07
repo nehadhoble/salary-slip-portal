@@ -17,6 +17,15 @@
   </div>
   <input type="hidden" name="employee_id" id="employee_id" value="{{ form.employee_id }}">
 
+  <div class="form-row">
+    <label for="company">Company</label>
+    <select id="company" name="company">
+      {% for c in companies %}
+      <option value="{{ c }}" {{ 'selected' if form.company == c }}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
   <div class="form-grid">
     <div class="form-row">
       <label for="month">Month</label>
