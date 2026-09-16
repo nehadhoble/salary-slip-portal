@@ -102,9 +102,15 @@
     </div>
   </div>
 
-  <div class="form-row">
-    <label for="total_earnings">Total Earnings</label>
-    <input type="number" step="0.01" min="0" id="total_earnings" name="total_earnings" value="{{ form.total_earnings }}" required>
+  <div class="form-grid">
+    <div class="form-row">
+      <label for="total_earnings">Total Earnings</label>
+      <input type="number" step="0.01" min="0" id="total_earnings" name="total_earnings" value="{{ form.total_earnings }}" required>
+    </div>
+    <div class="form-row">
+      <label for="deduction">Deduction</label>
+      <input type="number" step="0.01" min="0" id="deduction" name="deduction" value="{{ form.deduction }}">
+    </div>
   </div>
 
   <div class="form-actions">

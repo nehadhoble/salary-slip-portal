@@ -40,6 +40,7 @@ SLIP_FIELDS = [
     "month", "year", "company", "employee_id", "employee_name", "employee_no",
     "designation", "location", "bank_details", "date_of_joining", "tax_regime",
     "pan", "uan", "pf_account_number", "esi_number", "pran", "total_earnings",
+    "deduction",
 ]
 
 app = Flask(__name__)
@@ -290,10 +291,11 @@ def slip_form():
 def slip_preview():
     form = _form_data_from_request(request.form)
     total_earnings = _parse_amount(form["total_earnings"])
-    breakdown = calculate(total_earnings, db.load_settings())
+    deduction = _parse_amount(form.get("deduction", ""))
+    breakdown = calculate(total_earnings, db.load_settings(), deduction)
     rows = breakdown_rows(breakdown)
-    net = format_amount(breakdown["total_earnings"])
-    words = amount_to_words(breakdown["total_earnings"]) if total_earnings > 0 else ""
+    net = format_amount(breakdown["net_amount"])
+    words = amount_to_words(breakdown["net_amount"]) if breakdown["net_amount"] > 0 else ""
     has_signature = db.SIGNATURE_PATH.exists()
     return render_template(
         "preview.html",
@@ -314,7 +316,8 @@ def slip_preview():
 def slip_pdf():
     form = _form_data_from_request(request.form)
     total_earnings = _parse_amount(form["total_earnings"])
-    breakdown = calculate(total_earnings, db.load_settings())
+    deduction = _parse_amount(form.get("deduction", ""))
+    breakdown = calculate(total_earnings, db.load_settings(), deduction)
 
     pdf_form = dict(form)
     if form.get("employee_id"):

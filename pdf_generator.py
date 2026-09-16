@@ -77,12 +77,15 @@ def _wrap_text(text, font, size, max_width):
 
 
 def _build_payslip_rows(breakdown):
-    net = format_amount(breakdown["total_earnings"])
+    net = format_amount(breakdown["net_amount"])
+    deduction = format_amount(breakdown["deduction"])
+    has_deduction = breakdown["deduction"] > 0
     return [
         {"el": "Earnings", "ea": "Amount", "eg": "Gross Salary", "dl": "Deductions",
          "da": "Amount", "dg": "Gross Salary", "bold": False, "header": True},
         {"el": "Basic Pay", "ea": format_amount(breakdown["basic_pay"]), "eg": format_amount(breakdown["basic_pay"]),
-         "dl": "", "da": "", "dg": "", "bold": False, "header": False},
+         "dl": "Deduction" if has_deduction else "", "da": deduction if has_deduction else "",
+         "dg": deduction if has_deduction else "", "bold": False, "header": False},
         {"el": "Conveyance Allowance", "ea": format_amount(breakdown["conveyance_allowance"]),
          "eg": format_amount(breakdown["conveyance_allowance"]), "dl": "", "da": "", "dg": "",
          "bold": False, "header": False},
@@ -94,8 +97,8 @@ def _build_payslip_rows(breakdown):
          "eg": format_amount(breakdown["other_allowances"]), "dl": "", "da": "", "dg": "",
          "bold": False, "header": False},
         {"el": "Total Earnings", "ea": format_amount(breakdown["total_earnings"]),
-         "eg": format_amount(breakdown["total_earnings"]), "dl": "Total Deductions", "da": "0.00",
-         "dg": "0.00", "bold": True, "header": False},
+         "eg": format_amount(breakdown["total_earnings"]), "dl": "Total Deductions", "da": deduction,
+         "dg": deduction, "bold": True, "header": False},
         {"el": "", "ea": "", "eg": "", "dl": "Net Amount", "da": f"Rs. {net}", "dg": f"Rs. {net}",
          "bold": True, "header": False},
     ]
@@ -195,7 +198,7 @@ def _draw_footer(c, start_y, breakdown, company, signature_path):
     _draw_text(c, MARGIN, start_y, "Amount (in words):", 8.6, bold=True)
     _draw_text(c, right_x, start_y, f"for {company['name']}", 9.5, bold=True, align="right")
 
-    words = amount_to_words(breakdown["total_earnings"])
+    words = amount_to_words(breakdown["net_amount"])
     wrapped = _wrap_text(words, FONT_REGULAR, 9.0, USABLE_WIDTH * 0.62)
     y = start_y + 14
     for line in wrapped:

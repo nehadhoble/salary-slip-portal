@@ -59,16 +59,22 @@
         <td>{{ label }}</td>
         <td class="num">{{ format_amount(amount) }}</td>
         <td class="num">{{ format_amount(amount) }}</td>
+        {% if loop.first and breakdown.deduction > 0 %}
+        <td>Deduction</td>
+        <td class="num">{{ format_amount(breakdown.deduction) }}</td>
+        <td class="num">{{ format_amount(breakdown.deduction) }}</td>
+        {% else %}
         <td></td><td></td><td></td>
+        {% endif %}
       </tr>
       {% endfor %}
       <tr class="bold-row">
         <td>Total Earnings</td>
-        <td class="num">{{ net }}</td>
-        <td class="num">{{ net }}</td>
+        <td class="num">{{ format_amount(breakdown.total_earnings) }}</td>
+        <td class="num">{{ format_amount(breakdown.total_earnings) }}</td>
         <td>Total Deductions</td>
-        <td class="num">0.00</td>
-        <td class="num">0.00</td>
+        <td class="num">{{ format_amount(breakdown.deduction) }}</td>
+        <td class="num">{{ format_amount(breakdown.deduction) }}</td>
       </tr>
       <tr class="bold-row">
         <td></td><td></td><td></td>
