@@ -59,10 +59,14 @@
         <td>{{ label }}</td>
         <td class="num">{{ format_amount(amount) }}</td>
         <td class="num">{{ format_amount(amount) }}</td>
-        {% if loop.first and breakdown.deduction > 0 %}
-        <td>Deduction</td>
-        <td class="num">{{ format_amount(breakdown.deduction) }}</td>
-        <td class="num">{{ format_amount(breakdown.deduction) }}</td>
+        {% if loop.index == 1 %}
+        <td>TDS</td>
+        <td class="num">{{ format_amount(breakdown.tds) }}</td>
+        <td class="num">{{ format_amount(breakdown.tds) }}</td>
+        {% elif loop.index == 2 %}
+        <td>Leave</td>
+        <td class="num">{{ format_amount(breakdown.leave) }}</td>
+        <td class="num">{{ format_amount(breakdown.leave) }}</td>
         {% else %}
         <td></td><td></td><td></td>
         {% endif %}

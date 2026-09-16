@@ -79,15 +79,15 @@ def _wrap_text(text, font, size, max_width):
 def _build_payslip_rows(breakdown):
     net = format_amount(breakdown["net_amount"])
     deduction = format_amount(breakdown["deduction"])
-    has_deduction = breakdown["deduction"] > 0
+    tds = format_amount(breakdown["tds"])
+    leave = format_amount(breakdown["leave"])
     return [
         {"el": "Earnings", "ea": "Amount", "eg": "Gross Salary", "dl": "Deductions",
          "da": "Amount", "dg": "Gross Salary", "bold": False, "header": True},
         {"el": "Basic Pay", "ea": format_amount(breakdown["basic_pay"]), "eg": format_amount(breakdown["basic_pay"]),
-         "dl": "Deduction" if has_deduction else "", "da": deduction if has_deduction else "",
-         "dg": deduction if has_deduction else "", "bold": False, "header": False},
+         "dl": "TDS", "da": tds, "dg": tds, "bold": False, "header": False},
         {"el": "Conveyance Allowance", "ea": format_amount(breakdown["conveyance_allowance"]),
-         "eg": format_amount(breakdown["conveyance_allowance"]), "dl": "", "da": "", "dg": "",
+         "eg": format_amount(breakdown["conveyance_allowance"]), "dl": "Leave", "da": leave, "dg": leave,
          "bold": False, "header": False},
         {"el": "HRA", "ea": format_amount(breakdown["hra"]), "eg": format_amount(breakdown["hra"]),
          "dl": "", "da": "", "dg": "", "bold": False, "header": False},

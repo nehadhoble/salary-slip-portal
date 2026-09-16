@@ -40,7 +40,7 @@ SLIP_FIELDS = [
     "month", "year", "company", "employee_id", "employee_name", "employee_no",
     "designation", "location", "bank_details", "date_of_joining", "tax_regime",
     "pan", "uan", "pf_account_number", "esi_number", "pran", "total_earnings",
-    "deduction",
+    "tds", "leave",
 ]
 
 app = Flask(__name__)
@@ -291,8 +291,9 @@ def slip_form():
 def slip_preview():
     form = _form_data_from_request(request.form)
     total_earnings = _parse_amount(form["total_earnings"])
-    deduction = _parse_amount(form.get("deduction", ""))
-    breakdown = calculate(total_earnings, db.load_settings(), deduction)
+    tds = _parse_amount(form.get("tds", ""))
+    leave = _parse_amount(form.get("leave", ""))
+    breakdown = calculate(total_earnings, db.load_settings(), tds, leave)
     rows = breakdown_rows(breakdown)
     net = format_amount(breakdown["net_amount"])
     words = amount_to_words(breakdown["net_amount"]) if breakdown["net_amount"] > 0 else ""
@@ -316,8 +317,9 @@ def slip_preview():
 def slip_pdf():
     form = _form_data_from_request(request.form)
     total_earnings = _parse_amount(form["total_earnings"])
-    deduction = _parse_amount(form.get("deduction", ""))
-    breakdown = calculate(total_earnings, db.load_settings(), deduction)
+    tds = _parse_amount(form.get("tds", ""))
+    leave = _parse_amount(form.get("leave", ""))
+    breakdown = calculate(total_earnings, db.load_settings(), tds, leave)
 
     pdf_form = dict(form)
     if form.get("employee_id"):

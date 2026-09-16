@@ -33,14 +33,16 @@ def settings_is_valid(settings):
     return basic_fraction * combined_fraction < 1.0
 
 
-def calculate(total_earnings, settings=None, deduction=0.0):
+def calculate(total_earnings, settings=None, tds=0.0, leave=0.0):
     """Returns a dict breakdown: basic_pay, conveyance_allowance, hra, lta,
-    other_allowances, total_earnings, deduction, net_amount.
+    other_allowances, total_earnings, tds, leave, deduction, net_amount.
 
-    deduction is a single slip-level amount subtracted from total_earnings to
-    get net_amount; it's capped so net_amount never goes below zero."""
+    tds and leave are the two slip-level deductions; deduction is their sum,
+    subtracted from total_earnings to get net_amount (floored at zero)."""
     settings = settings or DEFAULT_SETTINGS
-    deduction = _round2(max(0.0, deduction or 0.0))
+    tds = _round2(max(0.0, tds or 0.0))
+    leave = _round2(max(0.0, leave or 0.0))
+    deduction = _round2(tds + leave)
     if total_earnings is None or total_earnings <= 0.0:
         return {
             "basic_pay": 0.0,
@@ -49,7 +51,9 @@ def calculate(total_earnings, settings=None, deduction=0.0):
             "lta": 0.0,
             "other_allowances": 0.0,
             "total_earnings": 0.0,
-            "deduction": 0.0,
+            "tds": tds,
+            "leave": leave,
+            "deduction": deduction,
             "net_amount": 0.0,
         }
     basic = _round2(total_earnings * settings["basic_pct"] / 100.0)
@@ -57,7 +61,6 @@ def calculate(total_earnings, settings=None, deduction=0.0):
     lta = _round2(basic * settings["lta_pct"] / 100.0)
     other = _round2(basic * settings["other_pct"] / 100.0)
     conveyance = _round2(total_earnings - (basic + hra + lta + other))
-    deduction = min(deduction, total_earnings)
     return {
         "basic_pay": basic,
         "conveyance_allowance": conveyance,
@@ -65,8 +68,10 @@ def calculate(total_earnings, settings=None, deduction=0.0):
         "lta": lta,
         "other_allowances": other,
         "total_earnings": total_earnings,
+        "tds": tds,
+        "leave": leave,
         "deduction": deduction,
-        "net_amount": _round2(total_earnings - deduction),
+        "net_amount": _round2(max(0.0, total_earnings - deduction)),
     }
 
 
