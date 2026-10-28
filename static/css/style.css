@@ -97,10 +97,10 @@ h2 { font-size: 1.1rem; margin: 0 0 8px; }
 .btn-secondary:hover { background: #f0f2f7; text-decoration: none; }
 
 .table-wrap { overflow-x: auto; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; }
-table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
-th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
-th { color: var(--muted); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: .03em; }
-tr:last-child td { border-bottom: none; }
+.table-wrap table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+.table-wrap th, .table-wrap td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+.table-wrap th { color: var(--muted); font-weight: 600; font-size: 0.82rem; text-transform: uppercase; letter-spacing: .03em; }
+.table-wrap tr:last-child td { border-bottom: none; }
 .row-actions a, .row-actions button { margin-right: 12px; font: inherit; }
 .link-danger { background: none; border: none; padding: 0; color: var(--danger); cursor: pointer; text-decoration: underline; }
 .inline-form { display: inline; }
