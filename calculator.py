@@ -15,8 +15,8 @@ DEFAULT_SETTINGS = {
 }
 
 
-def _round2(value):
-    return float(Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP))
+def _round_whole(value):
+    return int(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 
 def settings_is_valid(settings):
@@ -33,45 +33,42 @@ def settings_is_valid(settings):
     return basic_fraction * combined_fraction < 1.0
 
 
-def calculate(total_earnings, settings=None, tds=0.0, leave=0.0):
-    """Returns a dict breakdown: basic_pay, conveyance_allowance, hra, lta,
-    other_allowances, total_earnings, tds, leave, deduction, net_amount.
+def calculate(total_earnings, settings=None, tds=0.0, leave=0.0, plb=0.0):
+    """Returns a dict breakdown (all amounts in whole rupees): basic_pay,
+    conveyance_allowance, hra, lta, other_allowances, plb, total_earnings, tds,
+    leave, deduction, net_amount.
 
-    tds and leave are the two slip-level deductions; deduction is their sum,
-    subtracted from total_earnings to get net_amount (floored at zero)."""
+    total_earnings passed in is the fixed amount the percentage split is built
+    from. plb is entered manually and sits outside that split; it is added on
+    top, so the returned total_earnings is the split amount plus plb. tds and
+    leave sum to deduction, subtracted to get net_amount (floored at zero)."""
     settings = settings or DEFAULT_SETTINGS
-    tds = _round2(max(0.0, tds or 0.0))
-    leave = _round2(max(0.0, leave or 0.0))
-    deduction = _round2(tds + leave)
-    if total_earnings is None or total_earnings <= 0.0:
-        return {
-            "basic_pay": 0.0,
-            "conveyance_allowance": 0.0,
-            "hra": 0.0,
-            "lta": 0.0,
-            "other_allowances": 0.0,
-            "total_earnings": 0.0,
-            "tds": tds,
-            "leave": leave,
-            "deduction": deduction,
-            "net_amount": 0.0,
-        }
-    basic = _round2(total_earnings * settings["basic_pct"] / 100.0)
-    hra = _round2(basic * settings["hra_pct"] / 100.0)
-    lta = _round2(basic * settings["lta_pct"] / 100.0)
-    other = _round2(basic * settings["other_pct"] / 100.0)
-    conveyance = _round2(total_earnings - (basic + hra + lta + other))
+    base = _round_whole(max(0.0, total_earnings or 0.0))
+    plb = _round_whole(max(0.0, plb or 0.0))
+    tds = _round_whole(max(0.0, tds or 0.0))
+    leave = _round_whole(max(0.0, leave or 0.0))
+    deduction = tds + leave
+    if base <= 0:
+        basic = hra = lta = other = conveyance = 0
+    else:
+        basic = _round_whole(base * settings["basic_pct"] / 100.0)
+        hra = _round_whole(basic * settings["hra_pct"] / 100.0)
+        lta = _round_whole(basic * settings["lta_pct"] / 100.0)
+        other = _round_whole(basic * settings["other_pct"] / 100.0)
+        conveyance = base - (basic + hra + lta + other)
+    gross = base + plb
     return {
         "basic_pay": basic,
         "conveyance_allowance": conveyance,
         "hra": hra,
         "lta": lta,
         "other_allowances": other,
-        "total_earnings": total_earnings,
+        "plb": plb,
+        "total_earnings": gross,
         "tds": tds,
         "leave": leave,
         "deduction": deduction,
-        "net_amount": _round2(max(0.0, total_earnings - deduction)),
+        "net_amount": max(0, gross - deduction),
     }
 
 
@@ -83,4 +80,5 @@ def breakdown_rows(breakdown):
         ("HRA", breakdown["hra"]),
         ("LTA", breakdown["lta"]),
         ("Other Allowances", breakdown["other_allowances"]),
+        ("PLB", breakdown["plb"]),
     ]

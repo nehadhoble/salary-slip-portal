@@ -56,15 +56,9 @@ def number_to_indian_words(number):
 
 
 def amount_to_words(amount):
-    """e.g. "INR Fifty Four Thousand One Hundred Sixty Six and Ninety Nine Paise Only" """
-    rounded = Decimal(str(amount)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    rupees = int(rounded)
-    paise = int((rounded - rupees) * 100)
-
-    rupee_words = number_to_indian_words(rupees)
-    if paise > 0:
-        return f"INR {rupee_words} and {number_to_indian_words(paise)} Paise Only"
-    return f"INR {rupee_words} Only"
+    """Whole rupees only, e.g. "INR Fifty Four Thousand One Hundred Sixty Seven Only" """
+    rupees = int(Decimal(str(amount)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
+    return f"INR {number_to_indian_words(rupees)} Only"
 
 
 def _indian_group(int_part_str):
@@ -82,9 +76,7 @@ def _indian_group(int_part_str):
 
 
 def format_amount(amount):
-    """e.g. 54166.99 -> "54,166.99" using Indian digit grouping."""
-    rounded = Decimal(str(amount)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    """Whole rupees with Indian digit grouping, e.g. 54167 -> "54,167"."""
+    rounded = int(Decimal(str(amount)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
     sign = "-" if rounded < 0 else ""
-    rounded = abs(rounded)
-    int_part, frac_part = f"{rounded:.2f}".split(".")
-    return f"{sign}{_indian_group(int_part)}.{frac_part}"
+    return f"{sign}{_indian_group(str(abs(rounded)))}"

@@ -96,6 +96,8 @@ def _build_payslip_rows(breakdown):
         {"el": "Other Allowances", "ea": format_amount(breakdown["other_allowances"]),
          "eg": format_amount(breakdown["other_allowances"]), "dl": "", "da": "", "dg": "",
          "bold": False, "header": False},
+        {"el": "PLB", "ea": format_amount(breakdown["plb"]), "eg": format_amount(breakdown["plb"]),
+         "dl": "", "da": "", "dg": "", "bold": False, "header": False},
         {"el": "Total Earnings", "ea": format_amount(breakdown["total_earnings"]),
          "eg": format_amount(breakdown["total_earnings"]), "dl": "Total Deductions", "da": deduction,
          "dg": deduction, "bold": True, "header": False},
